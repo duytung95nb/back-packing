@@ -1,8 +1,9 @@
 import React from 'react';
 import { StyleSheet, Text, TextInput, View, Button } from 'react-native';
 import firebase from 'react-native-firebase';
+import BaseScreen from './_core/baseScreen';
 
-export default class Login extends React.Component {
+export default class Login extends BaseScreen {
     state = { email: '', password: '', errorMessage: null }
     handleLogin = () => {
         const { email, password } = this.state;

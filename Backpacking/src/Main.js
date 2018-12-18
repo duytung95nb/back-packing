@@ -2,20 +2,26 @@ import React from 'react';
 import { StyleSheet, Text, View, ToolbarAndroid } from 'react-native';
 import Dashboard from './dashboard/dashboard';
 import firebase from 'react-native-firebase';
+import BaseScreen from './_core/baseScreen';
+import DataResourcesConstant from './_core/database/dataResources.constant';
 
-export default class Main extends React.Component {
-    state = { currentUser: {email: '', displayName: ''} };
+export default class Main extends BaseScreen {
+    state = {
+        currentUser: { id: '', email: '', displayName: '', groupId: ''},
+        group: { id: '', name: '' }
+    };
     componentDidMount() {
-        const { currentUser } = firebase.auth();
-        this.setState({ currentUser });
+        this.fetchUserAndGroupData();
+        // Check if the user belongs to any group
     }
+
     render() {
         const { currentUser } = this.state;
         return (
             <View style={styles.container}>
                <ToolbarAndroid
                     style={styles.toolbar}
-                    title="Movies"
+                    title="Dashboard"
                     onActionSelected={this.onActionSelected}
                     titleColor= "#000"
                     actions = {[
@@ -33,6 +39,25 @@ export default class Main extends React.Component {
             ? currentUser.displayName
             : currentUser.email; 
     }
+
+    fetchUserAndGroupData = () => {
+        let { currentUser } = firebase.auth();
+        firebase.database().ref(`${DataResourcesConstant.users}/${currentUser.uid}`)
+            .once('value', (cutomUser) => {
+                console.log('cutomUser', cutomUser);
+                currentUser.groupId = cutomUser.groupId; // its not custom user data, read document again abouot returned data type
+                if(currentUser.groupId === null) {
+                    this.setState({ currentUser });
+                    return;
+                }
+                firebase.database().ref(`${DataResourcesConstant.groups}/${currentUser.groupId}`)
+                    .once('value', (snapshot) => {
+                    const group = snapshot.val();
+                    this.setState({ currentUser, group});
+                });
+            });
+    }
+
     onActionSelected = async (position) => {
         if (position === 1) { // index of 'Logout'
             try {

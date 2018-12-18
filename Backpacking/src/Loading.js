@@ -1,11 +1,12 @@
 import React from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import firebase from 'react-native-firebase';
+import BaseScreen from './_core/baseScreen';
 
-export default class Loading extends React.Component {
+export default class Loading extends BaseScreen {
     componentDidMount() {
         firebase.auth().onAuthStateChanged(user => {
-            this.props.navigation.navigate(user ? 'Main' : 'SignUp')
+            this.props.navigation.navigate(user ? 'Main' : 'Login')
         });
     }
     render() {

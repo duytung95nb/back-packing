@@ -25,5 +25,4 @@ const App = SwitchNavigator(
     initialRouteName: 'Loading'
   }
 );
-
 export default App;
